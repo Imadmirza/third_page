@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mi Horizon Cipla – Explore All Apps</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-dark: #1a3a6b;
+    --blue-mid:  #1565c0;
+    --teal:      #00a896;
+    --pink:      #e6007e;
+    --orange:    #f5a623;
+    --bg:        #dceef8;
+    --sidebar-bg:#005BA6;
+    --text-dark: #1a2a3a;
+    --card-radius: 12px;
+  }
+
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ─────────── SIDEBAR ─────────── */
+  .sidebar {
+    width: 72px; background: var(--sidebar-bg);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 18px 0 24px;
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+  }
+    .sidebar-item a {
+  text-decoration: none;
+  color: inherit;
+  }
+  .sidebar-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; padding: 12px 8px; cursor: pointer; width: 100%;
+    color: rgba(255,255,255,0.6); font-size: 8px;
+    font-family: 'Poppins', sans-serif; font-weight: 600;
+    transition: background .2s; text-align: center;
+  }
+  .sidebar-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .sidebar-item.active { color: #fff; }
+  .sidebar-item .icon-wrap {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+  }
+  .sidebar-item.active .icon-wrap { background: rgba(255,255,255,0.15); }
+  .sidebar-item img { width: 22px; height: 22px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.7; }
+  .sidebar-item:hover img, .sidebar-item.active img { opacity: 1; }
+
+  /* ── Region dropdown ── */
+  .region-dropdown {
+    position: absolute; left: 76px; bottom: 10px;
+    background: #005BA6; border-radius: 10px;
+    min-width: 165px; box-shadow: 0 8px 28px rgba(0,0,0,0.32);
+    overflow: hidden; z-index: 200;
+    opacity: 0; pointer-events: none;
+    transform: translateX(-6px);
+    transition: opacity .2s, transform .2s;
+  }
+  .region-dropdown.open { opacity: 1; pointer-events: all; transform: translateX(0); }
+  .region-dropdown-item {
+    padding: 11px 18px; color: rgba(255,255,255,0.75);
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    transition: background .15s, color .15s; text-decoration: none;
+  }
+  .region-dropdown-item:hover { background: rgba(255,255,255,0.12); color: #fff; }
+  .region-dropdown-item.selected { color: #fff; }
+  .region-dropdown-item .check { font-size: 13px; width: 14px; flex-shrink: 0; }
+  .region-wrap { position: relative; width: 100%; }
+
+  /* ─────────── MAIN LAYOUT ─────────── */
+  .main-wrapper {
+    margin-left: 72px; flex: 1;
+    display: flex; height: 100vh; overflow: hidden;
+  }
+
+  /* ─────────── FULL-WIDTH PANEL ─────────── */
+  .full-panel {
+    flex: 1;
+    padding: 18px 22px 16px;
+    display: flex; flex-direction: column; gap: 0;
+    height: 100vh; overflow-y: auto; overflow-x: hidden;
+    background: #fff;
+  }
+  .full-panel::-webkit-scrollbar { width: 4px; }
+  .full-panel::-webkit-scrollbar-thumb { background: #b0ccec; border-radius: 4px; }
+
+  /* Search bar */
+  .search-bar-left {
+    width: 100%; background: #fff; border: 1.5px solid #c9dff5;
+    border-radius: 8px; padding: 7px 14px;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .search-bar-left input {
+    border: none; outline: none; background: none;
+    font-size: 13px; color: #333; width: 100%;
+    font-family: 'Poppins', sans-serif;
+  }
+  .search-bar-left input::placeholder { color: #aaa; }
+
+  /* Welcome heading */
+  .welcome-heading {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20.64px;
+  font-weight: 600;
+  color: var(--blue-mid);
+  flex-shrink: 0;
+  line-height: 1.3;
+  width: 542px;
+  letter-spacing: 0px;
+
+  padding: 10px 0;   /* 👈 adds vertical breathing space */
+  height: auto;      /* 👈 IMPORTANT: remove fixed height */
+}
+
+  /* ── Quick Action card ── */
+  .qa-card {
+    background: #fff; border-radius: var(--card-radius);
+    padding: 16px 18px; flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0,48,135,0.07);
+  }
+  .section-title {
+    font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; margin-top: 20px;  
+    color: var(--text-dark); margin-bottom: 14px; width: 183.65px; line-height: 150%; letter-spacing: 0;
+  }
+  .qa-row {
+    display: flex; align-items: flex-start; gap: 10px; justify-content: flex-start;
+  }
+  .qa-app {
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 6px; width: 90px; padding: 0;
+  }
+  .qa-app {
+  width: 130px;
+  height: 210px;
+  background: #D9D9D933;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.app-item {
+  width: 170px;
+  height: 200px;
+  background: #D9D9D933;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+  .qa-icon {
+    width: 50px; height: 50px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform .2s, box-shadow .2s; flex-shrink: 0;
+  }
+  .qa-icon:hover { transform: translateY(-2px); box-shadow: 0 7px 18px rgba(0,0,0,0 .16); }
+  .qa-icon.pink { background: linear-gradient(135deg, #f472b6, var(--pink)); }
+  .qa-name {
+    font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 550;
+    color: var(--text-dark); text-align: left; width: 78.62px; line-height: 11.73px; letter-spacing: 0.06px;
+  }
+  .qa-tags { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; width: 100%; }
+
+ .qa-app img,
+ .app-item img {
+  width: 78.62px !important;
+  height: 70.41px !important;
+  border-radius: 9.39px;
+  object-fit: contain;
+  display: block;
+  }
+
+  .qa-card .tag {
+  background: #F49AC1 !important;
+    color: #000000 !important;
+}
+
+  .app-item .tag {
+  background: #005BA6 !important;
+  color: #fff !important;
+}
+  
+  .qa-app:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+  
+  }
+  .app-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+}
+
+
+
+  /* Tags */
+  .tag {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  margin-bottom: 2px;
+  border-radius: 10px;
+  white-space: nowrap;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+}
+
+
+  /* ── Section grid rows ── */
+  /* Two-column layout for paired sections (Learning + Careers, etc.) */
+  .two-col-row {
+    display: grid; grid-template-columns: 0fr 1fr;
+    gap: 50px; flex-shrink: 0; align-items: start;
+  }
+
+  /* Section card */
+  .section-card {
+    background: #fff; border-radius: var(--card-radius);
+    padding: 0; flex-shrink: 0;
+    box-shadow: none;
+    width: 100%;
+    justify-content: start;
+  }
+
+  /* App grid inside a section card */
+  /* .app-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px; 
+  max-width: 800px;
+  justify-content: start;
+  } */
+
+  /* Each app item */
+  .app-item {
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 6px; width: 130px;
+  }
+  .app-circle {
+    width: 50px; height: 50px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform .2s, box-shadow .2s; flex-shrink: 0;
+  }
+  .app-circle:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.14); }
+  .app-circle img { width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1); }
+  .app-circle.blue   { background: linear-gradient(135deg, #60a5fa, var(--blue-mid)); }
+  .app-circle.pink   { background: linear-gradient(135deg, #f472b6, var(--pink)); }
+  .app-circle.orange { background: linear-gradient(135deg, #fbbf24, var(--orange)); }
+  .app-circle.teal   { background: linear-gradient(135deg, #2dd4bf, var(--teal)); }
+  .app-circle.purple { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+  .app-circle.green  { background: linear-gradient(135deg, #4ade80, #16a34a); }
+
+  .app-name {
+    font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 550;
+    color: var(--text-dark); text-align: left; line-height: 1.3;
+  }
+  .app-item-tags { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+
+  /* Explore buttons */
+  .explore-row {
+    display: flex; gap: 12px; flex-shrink: 0; padding-bottom: 4px;
+  }
+  .btn-explore {
+    padding: 10px 22px; border-radius: 22px;
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 800;
+    cursor: pointer; border: none; transition: background .2s;
+  }
+  .btn-explore.primary   { background: var(--blue-dark); color: #fff; }
+  .btn-explore.primary:hover { background: #122d55; }
+  .btn-explore.secondary { background: var(--blue-mid); color: #fff; }
+  .btn-explore.secondary:hover { background: #0d47a1; }
+
+  @media (max-width: 900px) {
+    .two-col-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 1362px) {
+  .app-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px; 
+  max-width: 800px;
+  justify-content: start;}
+  }
+  @media (min-width: 1276px) {
+  .app-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px; 
+  max-width: 800px;
+  justify-content: start;}
+  }
+  @media (min-width: 1536px) {
+  .app-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px; 
+  max-width: 800px;}
+  }
+    @media (min-width: 1512px) {
+  .app-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px; 
+  max-width: 800px;}
+  }
+  @media (max-width: 640px) {
+    .main-wrapper { margin-left: 0; }
+    .sidebar { display: none; }
+  }
+  
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<nav class="sidebar">
+
+<!-- Home -->
+<div class="sidebar-item active">
+  
+  <div class="icon-wrap">
+    <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home" target="_blank">
+      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/eb975205cf0e4155b28d/Icon.png" alt="Home">
+    </a>
+  </div>
+
+  <div>
+    <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home" target="_blank">
+      Home
+    </a>
+  </div>
+
+</div>
+
+<!-- Employee Self-Service -->
+<div class="sidebar-item" style="margin-top:8px;">
+  
+  <div class="icon-wrap">
+    <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#Cipla-ESS?sap-app-origin-hint=&sap-ui-app-id-hint=12a3af88-57f9-46da-8255-2f4df348b538" target="_blank">
+      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/8f7162e124ec47978655/Grid.png" alt="Employee Self-Service">
+    </a>
+  </div>
+
+  <div>
+    <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#Cipla-ESS?sap-app-origin-hint=&sap-ui-app-id-hint=12a3af88-57f9-46da-8255-2f4df348b538" target="_blank">
+      Employee<br>Self-Service
+    </a>
+  </div>
+
+</div>
+
+  <!-- Region -->
+  <div class="region-wrap" style="margin-top:8px;">
+    <div class="sidebar-item" id="regionBtn" onclick="toggleRegionDropdown(event)">
+      <div class="icon-wrap">
+        <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/82cec4bb0cc545c39624/Group114.png" alt="Region">
+      </div>
+      <div>
+        Region<br><span id="regionLabel">India</span>
+      </div>
+    </div>
+
+    <div class="region-dropdown" id="regionDropdown">
+      <div class="region-dropdown-item selected">
+        <span class="check">✓</span> India
+      </div>
+
+      <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/x4FnQ571eHJHvzbSVID024" target="_blank">
+        <span class="check"></span> EMEU
+      </a>
+
+      <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/WGc33O2txB9Gbr9W4q6024" target="_blank">
+        <span class="check"></span> One Africa
+      </a>
+
+            <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/HPbQWT5ON9bPuxXwLle024" target="_blank">
+        <span class="check"></span> Subsidiaries
+      </a>
+
+            <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/Xuxy9NBhoBEb28U7zMo024" target="_blank">
+        <span class="check"></span> CHL
+      </a>
+
+      <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/Ey6nC87CwetoasFLo0f024" target="_blank">
+        <span class="check"></span> North America
+      </a>
+    </div>
+  </div>
+
+<!-- MiDas -->
+<div class="sidebar-item" style="margin-top:8px;">
+  
+  <div class="icon-wrap">
+    <a href="https://web.leena.ai/v2/?clientId=6FzCIUNhpefA_Okufvjnf" target="_blank">
+      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/22052b563e484ad5b4ce/icons.png"
+           alt="MiDas"
+           style="filter:none !important; opacity:1 !important; width:34px; height:34px;">
+    </a>
+  </div>
+
+  <div>
+    <a href="https://web.leena.ai/v2/?clientId=6FzCIUNhpefA_Okufvjnf" target="_blank">
+      MiDas
+    </a>
+  </div>
+
+</div>
+
+</nav>
+<!-- ── MAIN ── -->
+<div class="main-wrapper">
+<div class="full-panel">
+<!-- Search bar -->
+<div class="search-bar-left" style="position:relative;">
+  
+  <svg fill="none" height="15" stroke="#bbb" stroke-width="2.5" viewbox="0 0 24 24" width="15">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+  </svg>
+
+  <input id="appSearch" placeholder="Search for payslips, leaves, expenses…" type="text"/>
+
+  <!-- ❌ CLEAR BUTTON -->
+  <span id="clearSearch" style="
+      position:absolute;
+      right:12px;
+      cursor:pointer;
+      font-size:14px;
+      color:#999;
+      display:none;
+  ">✕</span>
+
+  <!-- DROPDOWN -->
+  <div id="searchDropdown" style="
+      position:absolute;
+      top:38px;
+      left:0;
+      right:0;
+      background:#fff;
+      border:1px solid #e0ecf7;
+      border-radius:8px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.1);
+      display:none;
+      z-index:999;
+      max-height:220px;
+      overflow-y:auto;
+  "></div>
+
+</div>
+<!-- Welcome heading -->
+<div class="welcome-heading">Hey, Welcome to My Employee Self-Service</div>
+<!-- ── My Quick Action Apps ── -->
+<div class="qa-card">
+<div class="section-title">My Quick Action Apps</div>
+<div class="qa-row">
+<div class="qa-app" onclick="openApp('https://cipla.peoplestrong.com/secureSloginRedirect.jsf?organizationId=229&idp=azure')">
+<img alt="MiTime" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/10b7b6c550d346669ebf/MiTime.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="qa-name">MiTime</span>
+<div class="qa-tags">
+<span class="tag green">Leaves</span>
+<span class="tag green">Time</span>
+<span class="tag pink">Attendance</span>
+<span class="tag blue">Holiday Calendar</span>
+</div>
+</div>
+<div class="qa-app" onclick="openApp('https://myapps.microsoft.com/signin/53369dbe-d581-4aa9-a7ab-9d3e1e38ae24?tenantId=e6fd9f9f-6c49-4254-b8e8-90fba073cceb')">
+<img alt="Mi Pay" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/6b745e83efa248c586dd/MiPay.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="qa-name">MiPay</span>
+<div class="qa-tags">
+<span class="tag green">Salary slip</span>
+<span class="tag green">IT declaration</span>
+<span class="tag pink">Choice Pay</span>
+<span class="tag blue">Childcare</span>
+</div>
+</div>
+<div class="qa-app" onclick="openApp('https://iexpense.cipla.com/mscallback.do')">
+<img alt="Mi Travel" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/93309673c03e4113955a/travelnew.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="qa-name">MiTravel &amp; Reimbursements</span>
+<div class="qa-tags">
+<span class="tag blue">Travel booking</span>
+<span class="tag pink">Reimbursement</span>
+</div>
+</div>
+<div class="qa-app" onclick="openApp('https://massist.in/c1kfq29')">
+<img alt="Mi Benefits" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/39496fc7620f4b90bb3b/MiBenefits.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="qa-name">MiBenefits</span>
+<div class="qa-tags">
+<span class="tag blue">Medical insurane</span>
+<span class="tag green">Network hospital</span>
+<span class="tag teal">Claim processing</span>
+</div>
+</div>
+</div>
+</div>
+<!-- ── People & Organization ── -->
+<div class="section-card">
+<div class="section-title">People &amp; Organization</div>
+<div class="app-grid">
+<div class="app-item" onclick="openApp('https://performancemanager10.successfactors.com/sf/pmreviews?bplte_company=C0001172882P')">
+<img alt="Performance" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/27ffd88edc0e47cb98f5/Performance.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">Performance</span>
+<div class="app-item-tags">
+<span class="tag pink">Annual review</span>
+<span class="tag blue">Regular Checkins</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://performancemanager10.successfactors.com/sf/personalinfo?company=C0001172882P')">
+<img alt="Mi Profile" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/f37d55ef11694453bdb7/MiProfileMiSelfService1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiProfile &amp; MiSelf-Service</span>
+<div class="app-item-tags">
+<span class="tag blue">Employee profile</span>
+<span class="tag green">Self Service</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://myapp.cipla.com/Nomination/')">
+<img alt="Mi Nomination" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/4bf0d3f9c9304450befe/MiNomination1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiNomination</span>
+<div class="app-item-tags">
+<span class="tag blue">Retirals</span>
+<span class="tag blue">Insurance</span>
+<span class="tag blue">F&F</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://performancemanager10.successfactors.com/sf/goals?company=C0001172882P')">
+<img alt="Goals" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/97d210556ea74cdfaef6/midnagoals1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">Goals</span>
+<div class="app-item-tags">
+<span class="tag blue">Goal management</span>
+<span class="tag pink">Goal Checkins</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://performancemanager10.successfactors.com/sf/home?')">
+<img alt="MiHorizon" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/1a8ea0fdf5dd497f9c16/MiHorizon1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiHorizon</span>
+<div class="app-item-tags">
+<span class="tag teal">HR Information <br> system</span>
+<span class="tag teal">Employee Lifecycle</span>
+
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://performancemanager10.successfactors.com/sf/orgchart?company=C0001172882P')">
+<img alt="MiOrgChart" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/e09a5a49c400440a935a/MiOrgchart1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiOrgChart</span>
+<div class="app-item-tags">
+<span class="tag blue">Org heirarchy</span>
+<span class="tag blue">Position<br>management</span>
+<span class="tag blue">Job requisition</span>
+
+</div>
+</div>
+</div>
+</div>
+<!-- ── Learning + Careers ── -->
+<div class="two-col-row">
+<!-- Learning -->
+<div class="section-card">
+<div class="section-title">Learning</div>
+<div class="app-grid">
+<div class="app-item" onclick="openApp('https://ciplalimit.plateau.com/learning/user/personal/landOnPortalHome.do?OWASP_CSRFTOKEN=8VK6-8FPG-Q5TC-68RB-RYDK-XEGE-WSEE-XMBV&fromSF=Y&fromDeepLink=true&pageID=')">
+<img alt="MiLearning" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/db2cd0ac4bc4400d976f/milearningwhite.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiLearning (LMS)</span>
+<div class="app-item-tags">
+<span class="tag blue">Learning modules</span>
+<span class="tag green">Mandatory trainings</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://milearning.cipla.com')">
+<img alt="Learning Calendar" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/6f88e91d381649d49838/LearningCalendar1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">Learning Calendar</span>
+<div class="app-item-tags">
+<span class="tag orange">Curated Calendar</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://Ciplamilearning.edcast.com')">
+<img alt="Cipla University" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/a41fb8af7bf1468daecb/CiplaUniversityCornerstone1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">Cipla University (Cornerstone)</span>
+<div class="app-item-tags">
+<span class="tag teal">Micro learning</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Careers -->
+<div class="section-card">
+<div class="section-title">Careers</div>
+<div class="app-grid">
+<div class="app-item" onclick="openApp('https://cipla.turbohire.co/e/login')">
+<img alt="MiRecruiting Turbohire" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/e7cd028c00cd45eaadc3/MiRecruitingTurbohire1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiRecruiting Turbohire</span>
+<div class="app-item-tags">
+<span class="tag blue">Hiring managers</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://performancemanager10.successfactors.com/sf/recruiting?company=C0001172882P')">
+<img alt="MiRecruiting ECM" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/e69c3cc3b44049d284da/MiRecruitingRCM1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiRecruiting: RCM</span>
+<div class="app-item-tags">
+<span class="tag pink">Recruiters</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://cipla.turbohire.co/login')">
+<img alt="MiRecruiting Turbohire" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/e7cd028c00cd45eaadc3/MiRecruitingTurbohire1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiRecruiting: Turbohire</span>
+<div class="app-item-tags">
+<span class="tag blue">Recruiters</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://cipla.tydy.co/')">
+<img alt="MiOnboarding" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/ea469690a836474ca8d7/MiOnboarding1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiOnboarding</span>
+<div class="app-item-tags">
+<span class="tag green">New joiner</span>
+<span class="tag green">Onboarding</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://performancemanager10.successfactors.com/sf/careers?company=C0001172882P')">
+<img alt="MiCareers" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/1e5d07792d214325990d/MiCareers1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiCareers</span>
+<div class="app-item-tags">
+<span class="tag teal">Internal Job<br>posting</span>
+<span class="tag teal">Referal</span>
+
+</div>
+</div>
+</div>
+</div>
+</div><!-- end two-col-row -->
+<!-- ── Care & Thrive + Financial & Support ── -->
+<div class="two-col-row">
+<!-- Care & Thrive -->
+<div class="section-card">
+<div class="section-title">Care &amp; Thrive</div>
+<div class="app-grid">
+<div class="app-item" onclick="openApp('https://mivolunteering.cipla.com/volunteer_events.aspx')">
+<img alt="Mi Volunteering" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/ffcf4064096e4dabb9dc/MiVolunteering1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiVolunteering</span>
+<div class="app-item-tags">
+<span class="tag green">Cipla for Change</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://cipla.thanks.com/app/login/sso')">
+<img alt="Mi Recognition" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/b0ee0f8ff3f2488aa13f/MiRecognition1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiRecognition</span>
+<div class="app-item-tags">
+<span class="tag pink">Applause</span>
+<span class="tag orange">Thanks</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://www.amahahealth.com/auth/sso/?redirectPage=log-in')">
+<img alt="Mi Wellbeing" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/2b321e9347b749529001/MiWellbeing1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiWellbeing</span>
+<div class="app-item-tags">
+<span class="tag teal">Private counselling</span>
+<span class="tag blue">Mental health<br>assesment</span>
+<span class="tag green">Mindfulness</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Financial & Support -->
+<div class="section-card">
+<div class="section-title">Financial &amp; Support</div>
+<div class="app-grid">
+<div class="app-item" onclick="openApp('https://app.refyne.co.in/#/loginRegister?authType=PHONE&tncType=EXPLICIT&referral=DISABLED')">
+<img alt="Mi Earned Salary" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/10a71ff3399747ae876e/MiEarnedSalary1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiEarned Salary</span>
+<div class="app-item-tags">
+<span class="tag green">Realtime access</span>
+<span class="tag blue">Earned Salary</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://jam10.sapjam.com/groups/VW0rKyORKawv8Aa6z6huMS/overview_page/H9LZzlWGLdYJhLUZJxSPfM')">
+<img alt="Banking Solutions" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/8d367477356144668b4f/BankingSolutions1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">Banking Solutions</span>
+<div class="app-item-tags">
+<span class="tag blue">Bank Offers</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://performancemanager10.successfactors.com/sf/liveprofile?mdfBlock=SEPARATION_UI1&bplte_company=C0001172882P')">
+<img alt="Mi Separation" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/1b421260e97045d4af7e/MiSeparation1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">MiSeparation</span>
+<div class="app-item-tags">
+<span class="tag gray">eSeparation</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://apc01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fcipla.m42cloud.com%2Fwm%2F&data=05%7C01%7Cabdeali.nalwala%40Cipla.com%7C4e0131ecbaa944908e6e08db0e5f2b2a%7Ce6fd9f9f6c494254b8e890fba073cceb%7C0%7C0%7C638119574123239089%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=r1gVD3CIDutG07%2B8yQQAJasqWMQLXoZ75XTmTNJO%2B8M%3D&reserved=0')">
+<img alt="IT Helpdesk" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/901d2bc0ff624a0ba93d/Itelpdesk.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">IT Helpdesk</span>
+<div class="app-item-tags">
+<span class="tag orange">iService</span>
+</div>
+</div>
+</div>
+</div>
+</div><!-- end two-col-row -->
+<!-- ── HR Tools ── -->
+<div class="section-card">
+<div class="section-title">HR Tools</div>
+<div class="app-grid">
+<div class="app-item" onclick="openApp('https://jecentral.cipla.com/')">
+<img alt="JE Central" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/030ba5630fc14f1ebc2e/JECentral1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">JE Central</span>
+<div class="app-item-tags">
+<span class="tag blue">Role evaluation</span>
+<span class="tag blue">Track roles</span>
+<span class="tag blue">Job description</span>
+
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://insights.cipla.com/')">
+<img alt="People Analytics" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/a65f188bd8c8415a9199/PeopleAnalytics.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">People Analytics</span>
+<div class="app-item-tags">
+<span class="tag blue">Dashboards</span>
+<span class="tag pink">HR Analytics</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://talentcentral.cipla.com')">
+<img alt="Talent Central" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/70b398ee0bb64978a87e/TalentCentral1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">Talent Central</span>
+<div class="app-item-tags">
+<span class="tag teal">Talent Review</span>
+<span class="tag teal">Development<br>Review</span>
+
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://ciplaltd.sharepoint.com/sites/EthicsCaseTracker/SitePages/CreateRequest.aspx')">
+<img alt="BI Case Management" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c2d14da2562747a4a314/ERCaseManagement1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">ER Case Management</span>
+<div class="app-item-tags">
+<span class="tag gray">Track employee <br> relation</span>
+</div>
+</div>
+<div class="app-item" onclick="openApp('https://ciplaltd.sharepoint.com/sites/policyreview?xsdata=MDV8MDJ8YWJkZWFsaS5uYWx3YWxhQENpcGxhLmNvbXxhN2NkYTE3YzIwYWM0MThiNzNjNzA4ZGRjODNmYjg0MHxlNmZkOWY5ZjZjNDk0MjU0YjhlODkwZmJhMDczY2NlYnwwfDB8NjM4ODg2ODk4MjI3NDUxNzk0fFVua25vd258VFdGcGJHWnNiM2Q4ZXlKRmJYQjBlVTFoY0draU9uUnlkV1VzSWxZaU9pSXdMakF1TURBd01DSXNJbEFpT2lKWGFXNHpNaUlzSWtGT0lqb2lUV0ZwYkNJc0lsZFVJam95ZlE9PXwwfHx8&sdata=ZjN4MGk0T2hPYzBMUVN4YndTK1EvR3FGTFYwNDMrUmo4MXcrYThwNzFCOD0%3d')">
+<img alt="Policy Review" src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/59a92f8327b64bc9bb12/Policyreview1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;"/>
+<span class="app-name">Policy Review</span>
+<div class="app-item-tags">
+<span class="tag blue">Policy review <br>mechanism</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Explore buttons -->
+
+</div><!-- end full-panel -->
+</div><!-- end main-wrapper -->
+<script>
+  // ── Staggered icon load animation ──
+  document.querySelectorAll('.qa-icon, .app-circle').forEach((el, i) => {
+    el.style.opacity = '0'; 
+    el.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+      el.style.transition = 'opacity .3s, transform .3s';
+      el.style.opacity = '1'; 
+      el.style.transform = 'none';
+    }, 40 + i * 35);
+  });
+
+  function openApp(url) {
+    window.open(url, '_blank');
+  }
+
+  // ── Region dropdown ──
+  function toggleRegionDropdown(e) {
+    e.stopPropagation();
+    document.getElementById('regionDropdown').classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('regionBtn').contains(e.target)) {
+      document.getElementById('regionDropdown').classList.remove('open');
+    }
+  });
+
+
+  /* ───────── ADVANCED SEARCH LOGIC ───────── */
+
+  const searchInput = document.getElementById('appSearch');
+  const dropdown = document.getElementById('searchDropdown');
+  const clearBtn = document.getElementById('clearSearch');
+
+  const apps = document.querySelectorAll('.qa-app, .app-item');
+
+  let appData = [];
+  let tagMap = {};
+
+  /* 🔹 COLLECT DATA */
+  apps.forEach(app => {
+    const nameEl = app.querySelector('.qa-name, .app-name');
+    const name = nameEl ? nameEl.innerText : '';
+
+    const tagsArr = Array.from(app.querySelectorAll('.tag')).map(t => t.innerText);
+    const onclick = app.getAttribute('onclick');
+
+    const appObj = {
+      name,
+      nameLower: name.toLowerCase(),
+      tags: tagsArr,
+      tagsLower: tagsArr.map(t => t.toLowerCase()),
+      onclick
+    };
+
+    appData.push(appObj);
+
+    // map tags → apps
+    tagsArr.forEach(tag => {
+      if (!tagMap[tag]) tagMap[tag] = [];
+      tagMap[tag].push(appObj);
+    });
+  });
+
+  const allTags = Object.keys(tagMap);
+
+  /* 🔍 SEARCH INPUT */
+  searchInput.addEventListener('input', function () {
+    const query = this.value.toLowerCase().trim();
+
+    dropdown.innerHTML = '';
+    clearBtn.style.display = query ? 'block' : 'none';
+
+    if (!query) {
+      dropdown.style.display = 'none';
+      return;
+    }
+
+    const matchedTags = allTags.filter(tag =>
+      tag.toLowerCase().includes(query)
+    );
+
+    const matchedApps = appData.filter(app =>
+      app.nameLower.includes(query)
+    );
+
+    /* ✅ TAG MODE → SHOW TAG + RELATED APPS */
+    if (matchedTags.length > 0) {
+
+      matchedTags.slice(0, 4).forEach(tag => {
+
+        // 🔖 TAG HEADER
+        const tagItem = document.createElement('div');
+        tagItem.style.padding = '8px 12px';
+        tagItem.style.fontSize = '12px';
+        tagItem.style.fontWeight = '600';
+        tagItem.style.color = '#1565c0';
+
+        tagItem.innerHTML = `🔖 ${tag}`;
+        dropdown.appendChild(tagItem);
+
+        // 👉 RELATED APPS
+        tagMap[tag].forEach(app => {
+          const subItem = document.createElement('div');
+
+          subItem.style.padding = '6px 24px';
+          subItem.style.cursor = 'pointer';
+          subItem.style.fontSize = '12px';
+
+          subItem.innerHTML = `→ ${app.name}`;
+
+          subItem.onclick = () => {
+            eval(app.onclick);
+          };
+
+          subItem.onmouseover = () => subItem.style.background = '#f0f6ff';
+          subItem.onmouseout = () => subItem.style.background = '#fff';
+
+          dropdown.appendChild(subItem);
+        });
+
+      });
+
+      dropdown.style.display = 'block';
+      return;
+    }
+
+    /* ✅ APP MODE */
+    if (matchedApps.length > 0) {
+
+      matchedApps.slice(0, 6).forEach(app => {
+        const item = document.createElement('div');
+
+        item.style.padding = '8px 12px';
+        item.style.cursor = 'pointer';
+        item.style.fontSize = '12px';
+
+        item.innerHTML = app.name; // proper case
+
+        item.onclick = () => {
+          eval(app.onclick);
+        };
+
+        item.onmouseover = () => item.style.background = '#f0f6ff';
+        item.onmouseout = () => item.style.background = '#fff';
+
+        dropdown.appendChild(item);
+      });
+
+      dropdown.style.display = 'block';
+      return;
+    }
+
+    dropdown.style.display = 'none';
+  });
+
+  /* ⌨️ ENTER KEY */
+  searchInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      const query = this.value.toLowerCase();
+
+      const match = appData.find(app =>
+        app.nameLower.includes(query)
+      );
+
+      if (match) {
+        eval(match.onclick);
+      }
+    }
+  });
+
+  /* ❌ CLEAR BUTTON */
+  clearBtn.addEventListener('click', function () {
+    searchInput.value = '';
+    dropdown.style.display = 'none';
+    this.style.display = 'none';
+    searchInput.focus();
+  });
+
+  /* CLICK OUTSIDE → CLOSE */
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.search-bar-left')) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+</script>
+</body>
+</html>
